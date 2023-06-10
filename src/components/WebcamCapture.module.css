@@ -1,3 +1,9 @@
 .webcam {
     display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+video {
+    width: auto;
 }

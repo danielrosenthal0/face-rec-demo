@@ -13,10 +13,10 @@ const WebcamCapture = (props) => {
     useEffect(()=> { //triggers webcam request when the component is first rendered, and because there are no dependencies, this is only tried once
         const enableWebcam = async () => {
             try {
-                const mediaStream = await openMediaDevices({'video':true,'audio':true}); //requests video and audio permission in browser
+                const mediaStream = await openMediaDevices({'video':true,'audio':false}); //requests video and audio permission in browser
                 setStream(mediaStream);
                 setWebcamEnabled(true);
-               
+                
             } catch(error) {
                 console.error('Error accessing media devices.', error);
             }
@@ -24,16 +24,23 @@ const WebcamCapture = (props) => {
         enableWebcam();
     },[]);
 
+    //set up videostream of srcObject
     useEffect(() => {
         console.log('Got MediaStream:', stream);
+        if (videoRef.current && stream) {
+            videoRef.current.srcObject = stream;
+        }
     }, [stream]);
     
-
 
     return (
         <Fragment>
             <div className={styles.webcam}>
-                {webcamEnabled && <video ref={videoRef} autoPlay width="100%" height="auto"/>}
+                <p>top of video</p>
+                {webcamEnabled && <video  ref={videoRef}  autoPlay> 
+                </video>}
+                
+                <p>webcam capture</p>
             </div>
         </Fragment>
     );
