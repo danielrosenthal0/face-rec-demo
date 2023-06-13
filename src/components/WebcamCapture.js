@@ -1,5 +1,6 @@
 import { Fragment, useState, useEffect, useRef } from "react";
 import styles from './WebcamCapture.module.css';
+import axios from "axios";
 
 const WebcamCapture = (props) => {
     const [webcamEnabled, setWebcamEnabled] = useState(false); //intitial state is false but usestate lets me update this later
@@ -22,6 +23,7 @@ const WebcamCapture = (props) => {
             }
         }
         enableWebcam();
+        
     },[]);
 
     //set up videostream of srcObject
@@ -30,17 +32,47 @@ const WebcamCapture = (props) => {
         if (videoRef.current && stream) {
             videoRef.current.srcObject = stream;
         }
+        //stops video and audio stream when stream is stopped by the user
+        return () => {
+            if (stream) {
+              stream.getTracks().forEach((track) => track.stop());
+            }
+            console.log("turning off camera");
+          };
     }, [stream]);
     
 
+    const captureImage = () => {
+        if (videoRef.current) {
+          const canvas = document.createElement("canvas");
+          const video = videoRef.current;
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          canvas.getContext("2d").drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+    
+          const imageData = canvas.toDataURL("image/png");
+    
+          axios.get("http://localhost:3001/detect", {
+            params: {
+              image: imageData
+            }
+          })
+          .then(response => {
+            console.log("Facial detection result:", response.data);
+          })
+          .catch(error => {
+            console.error("Error performing facial detection:", error);
+          });
+        }
+      };
     return (
         <Fragment>
             <div className={styles.webcam}>
-                <p>top of video</p>
-                {webcamEnabled && <video  ref={videoRef}  autoPlay> 
-                </video>}
                 
-                <p>webcam capture</p>
+                {webcamEnabled && <video  id="video-element" ref={videoRef}  autoPlay style={{ transform: "scaleX(-1)" }}> 
+                </video>}
+                <button onClick={captureImage}>Capture Image</button>
+                
             </div>
         </Fragment>
     );

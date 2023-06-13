@@ -1,5 +1,6 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import WebcamCapture from "./components/WebcamCapture";
+import FaceDetection from "./components/FaceDetection";
 
 function App() {
   const [webcamStarted, setWebcamStarted] = useState(false);
@@ -7,12 +8,19 @@ function App() {
   const handleStartWebcam = () => {
     setWebcamStarted(true);
   }
+  const handleEndWebcam = () => {
+    setWebcamStarted(false);
+  }
+
+  // const videoRef = useRef(null);
+
   return (
     <Fragment>
       {webcamStarted ? (
-        <WebcamCapture></WebcamCapture>
+        <WebcamCapture ></WebcamCapture>
       ) : <button onClick={handleStartWebcam}>Start Webcam Capture</button>}
-      
+      {webcamStarted && <button onClick={handleEndWebcam}>End Webcam Capture</button>}
+      {/* <FaceDetection></FaceDetection> */}
     </Fragment>
   );
 }
