@@ -82,23 +82,29 @@ const WebcamCapture = (props) => {
         .withFaceLandmarks()
         .withFaceExpressions();
       const resizedDetections = faceapi.resizeResults(detections, displaySize);
+      const context = canvasRef.current.getContext("2d");
 
-      canvasRef &&
-        canvasRef.current &&
-        canvasRef.current
-          .getContext("2d")
-          .clearRect(0, 0, videoWidth, videoHeight);
-      canvasRef &&
-        canvasRef.current &&
-        faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
-      canvasRef &&
-        canvasRef.current &&
-        faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
-      canvasRef &&
-        canvasRef.current &&
-        faceapi.draw.drawFaceExpressions(canvasRef.current, resizedDetections);
+      context.clearRect(0, 0, videoWidth, videoHeight);
+      faceapi.draw.drawDetections(context, resizedDetections);
+        faceapi.draw.drawFaceLandmarks(context, resizedDetections);
+        faceapi.draw.drawFaceExpressions(context, resizedDetections);
+
+    //   canvasRef &&
+    //     canvasRef.current &&
+    //     canvasRef.current
+    //       .getContext("2d")
+    //       .clearRect(0, 0, videoWidth, videoHeight);
+    //   canvasRef &&
+    //     canvasRef.current &&
+    //     faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
+    //   canvasRef &&
+    //     canvasRef.current &&
+    //     faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
+    //   canvasRef &&
+    //     canvasRef.current &&
+    //     faceapi.draw.drawFaceExpressions(canvasRef.current, resizedDetections);
       console.log("detections drawn");
-    }, 50);
+    }, 25);
   };
 
 
@@ -107,11 +113,11 @@ const WebcamCapture = (props) => {
     <Fragment>
       <div className={styles.webcam}>
         {webcamEnabled && modelsLoaded && (
-          <div>
+          <div style={{ position: 'relative' }}>
             <video autoPlay ref={videoRef} onPlay={handleVideoOnPLay}>
             
             </video>
-            <canvas ref={canvasRef}></canvas>
+            <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0 }}></canvas>
           </div>
         )}
       </div>
