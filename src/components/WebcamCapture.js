@@ -1,57 +1,122 @@
 import { Fragment, useState, useEffect, useRef } from "react";
-import styles from './WebcamCapture.module.css';
+import styles from "./WebcamCapture.module.css";
+import * as faceapi from "face-api.js";
 
 const WebcamCapture = (props) => {
-    const [webcamEnabled, setWebcamEnabled] = useState(false); //intitial state is false but usestate lets me update this later
-    const [stream, setStream] = useState(null);
-    const videoRef = useRef(null);
+  const [webcamEnabled, setWebcamEnabled] = useState(false); //intitial state is false but usestate lets me update this later
+  const [stream, setStream] = useState(null);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [modelsLoaded, setModelsLoaded] = useState(false);
+  const videoHeight = 480;
+  const videoWidth = 640;
 
-    const openMediaDevices = async (constraints) => {
-        return await navigator.mediaDevices.getUserMedia(constraints);
-    } //implements media devices interface w/ given constraints (getusermedia triggers the permissions request)
-    
-    useEffect(()=> { //triggers webcam request when the component is first rendered, and because there are no dependencies, this is only tried once
-        const enableWebcam = async () => {
-            try {
-                const mediaStream = await openMediaDevices({'video':true,'audio':false}); //requests video and audio permission in browser
-                setStream(mediaStream);
-                setWebcamEnabled(true);
-                
-            } catch(error) {
-                console.error('Error accessing media devices.', error);
-            }
-        }
-        enableWebcam();
+  useEffect(() => {
+    const loadModels = async () => {
+      const MODEL_URL = process.env.PUBLIC_URL + "/models";
 
-        
-    },[]);
+      Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
+      ]).then(setModelsLoaded(true));
+      console.log("models loaded");
+    };
+    loadModels();
+  }, []);
 
-    //set up videostream of srcObject
-    useEffect(() => {
-        console.log('Got MediaStream:', stream);
-        if (videoRef.current && stream) {
-            videoRef.current.srcObject = stream;
-        }
+  const openMediaDevices = async (constraints) => {
+    return await navigator.mediaDevices.getUserMedia(constraints);
+  }; //implements media devices interface w/ given constraints (getusermedia triggers the permissions request)
 
-        return () => {
-            if (stream) {
-                stream.getTracks().forEach((track) => track.stop());
-            }
-        }
-    }, [stream]);
-    
+  useEffect(() => {
+    //triggers webcam request when the component is first rendered, and because there are no dependencies, this is only tried once
+    const enableWebcam = async () => {
+      try {
+        const mediaStream = await openMediaDevices({
+          video: true,
+          audio: false,
+        }); //requests video and audio permission in browser
+        setStream(mediaStream);
+        setWebcamEnabled(true);
+      } catch (error) {
+        console.error("Error accessing media devices.", error);
+      }
+    };
+    enableWebcam();
+  }, []);
 
-    return (
-        <Fragment>
-            <div className={styles.webcam}>
-                <p>top of video</p>
-                {webcamEnabled && <video  ref={videoRef}  autoPlay> 
-                </video>}
-                
-                <p>webcam capture</p>
-            </div>
-        </Fragment>
-    );
-}
+  //set up videostream of srcObject
+  useEffect(() => {
+    console.log("Got MediaStream:", stream);
+    if (videoRef.current && stream) {
+      videoRef.current.srcObject = stream;
+    }
+    //completely stops video/audio stream in browser when stop button pressed
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+      console.log("ended video recording");
+    };
+  }, [stream]);
+
+  const handleVideoOnPLay = () => {
+    if (canvasRef && canvasRef.current) {
+        canvasRef.current.innerHTML = faceapi.createCanvasFromMedia(
+          videoRef.current
+        );
+      }
+      const displaySize = {
+        width: videoWidth,
+        height: videoHeight,
+      };
+      faceapi.matchDimensions(canvasRef.current, displaySize);
+
+      console.log("canvas created");
+    setInterval(async () => {
+      
+      const detections = await faceapi
+        .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceExpressions();
+      const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+      canvasRef &&
+        canvasRef.current &&
+        canvasRef.current
+          .getContext("2d")
+          .clearRect(0, 0, videoWidth, videoHeight);
+      canvasRef &&
+        canvasRef.current &&
+        faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
+      canvasRef &&
+        canvasRef.current &&
+        faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
+      canvasRef &&
+        canvasRef.current &&
+        faceapi.draw.drawFaceExpressions(canvasRef.current, resizedDetections);
+      console.log("detections drawn");
+    }, 50);
+  };
+
+
+
+  return (
+    <Fragment>
+      <div className={styles.webcam}>
+        {webcamEnabled && modelsLoaded && (
+          <div>
+            <video autoPlay ref={videoRef} onPlay={handleVideoOnPLay}>
+            
+            </video>
+            <canvas ref={canvasRef}></canvas>
+          </div>
+        )}
+      </div>
+    </Fragment>
+  );
+};
 
 export default WebcamCapture;
