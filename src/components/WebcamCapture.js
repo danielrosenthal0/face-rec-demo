@@ -47,6 +47,8 @@ const WebcamCapture = (props) => {
     enableWebcam();
   }, []);
 
+  
+
   //set up videostream of srcObject
   useEffect(() => {
     console.log("Got MediaStream:", stream);
@@ -57,6 +59,7 @@ const WebcamCapture = (props) => {
     return () => {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
+        
       }
       console.log("ended video recording");
     };
@@ -77,19 +80,29 @@ const WebcamCapture = (props) => {
     console.log("canvas created");
 
     setInterval(async () => {
-      const detections = await faceapi
-        .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceExpressions();
-      const resizedDetections = faceapi.resizeResults(detections, displaySize);
-      const context = canvasRef.current.getContext("2d");
-
-      context.clearRect(0, 0, videoWidth, videoHeight);
-      faceapi.draw.drawDetections(context, resizedDetections);
-      faceapi.draw.drawFaceLandmarks(context, resizedDetections);
-      faceapi.draw.drawFaceExpressions(context, resizedDetections);
-
-      console.log("detections drawn");
+      if (videoRef.current && canvasRef.current) {
+        const detections = await faceapi
+          .detectAllFaces(
+            videoRef.current,
+            new faceapi.TinyFaceDetectorOptions()
+          )
+          .withFaceLandmarks()
+          .withFaceExpressions();
+        const resizedDetections = faceapi.resizeResults(
+          detections,
+          displaySize
+        );
+        if (canvasRef.current) {
+            const context = canvasRef.current.getContext("2d");
+            context.clearRect(0, 0, videoWidth, videoHeight);
+            faceapi.draw.drawDetections(context, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(context, resizedDetections);
+            faceapi.draw.drawFaceExpressions(context, resizedDetections);
+    
+            console.log("detections drawn");
+        }
+        
+      }
     }, 25);
   };
 
