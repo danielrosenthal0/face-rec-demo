@@ -7,12 +7,16 @@ function App() {
   const handleStartWebcam = () => {
     setWebcamStarted(true);
   }
+
+  const handleEndWebcam = () => {
+    setWebcamStarted(false);
+  }
   return (
     <Fragment>
       {webcamStarted ? (
         <WebcamCapture></WebcamCapture>
       ) : <button onClick={handleStartWebcam}>Start Webcam Capture</button>}
-      
+      {webcamStarted && <button onClick={handleEndWebcam}>End Webcam Capture</button>}
     </Fragment>
   );
 }

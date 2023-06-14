@@ -22,6 +22,8 @@ const WebcamCapture = (props) => {
             }
         }
         enableWebcam();
+
+        
     },[]);
 
     //set up videostream of srcObject
@@ -29,6 +31,12 @@ const WebcamCapture = (props) => {
         console.log('Got MediaStream:', stream);
         if (videoRef.current && stream) {
             videoRef.current.srcObject = stream;
+        }
+
+        return () => {
+            if (stream) {
+                stream.getTracks().forEach((track) => track.stop());
+            }
         }
     }, [stream]);
     
