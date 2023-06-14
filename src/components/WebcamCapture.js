@@ -57,6 +57,7 @@ const WebcamCapture = (props) => {
     return () => {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
+        setWebcamEnabled(false);
       }
       console.log("ended video recording");
     };
@@ -64,19 +65,18 @@ const WebcamCapture = (props) => {
 
   const handleVideoOnPLay = () => {
     if (canvasRef && canvasRef.current) {
-        canvasRef.current.innerHTML = faceapi.createCanvasFromMedia(
-          videoRef.current
-        );
-      }
-      const displaySize = {
-        width: videoWidth,
-        height: videoHeight,
-      };
-      faceapi.matchDimensions(canvasRef.current, displaySize);
+      canvasRef.current.innerHTML = faceapi.createCanvasFromMedia(
+        videoRef.current
+      );
+    }
+    const displaySize = {
+      width: videoWidth,
+      height: videoHeight,
+    };
+    faceapi.matchDimensions(canvasRef.current, displaySize);
 
-      console.log("canvas created");
+    console.log("canvas created");
     setInterval(async () => {
-      
       const detections = await faceapi
         .detectAllFaces(videoRef.current, new faceapi.TinyFaceDetectorOptions())
         .withFaceLandmarks()
@@ -86,38 +86,23 @@ const WebcamCapture = (props) => {
 
       context.clearRect(0, 0, videoWidth, videoHeight);
       faceapi.draw.drawDetections(context, resizedDetections);
-        faceapi.draw.drawFaceLandmarks(context, resizedDetections);
-        faceapi.draw.drawFaceExpressions(context, resizedDetections);
+      faceapi.draw.drawFaceLandmarks(context, resizedDetections);
+      faceapi.draw.drawFaceExpressions(context, resizedDetections);
 
-    //   canvasRef &&
-    //     canvasRef.current &&
-    //     canvasRef.current
-    //       .getContext("2d")
-    //       .clearRect(0, 0, videoWidth, videoHeight);
-    //   canvasRef &&
-    //     canvasRef.current &&
-    //     faceapi.draw.drawDetections(canvasRef.current, resizedDetections);
-    //   canvasRef &&
-    //     canvasRef.current &&
-    //     faceapi.draw.drawFaceLandmarks(canvasRef.current, resizedDetections);
-    //   canvasRef &&
-    //     canvasRef.current &&
-    //     faceapi.draw.drawFaceExpressions(canvasRef.current, resizedDetections);
       console.log("detections drawn");
     }, 25);
   };
-
-
 
   return (
     <Fragment>
       <div className={styles.webcam}>
         {webcamEnabled && modelsLoaded && (
-          <div style={{ position: 'relative' }}>
-            <video autoPlay ref={videoRef} onPlay={handleVideoOnPLay}>
-            
-            </video>
-            <canvas ref={canvasRef} style={{ position: 'absolute', top: 0, left: 0 }}></canvas>
+          <div style={{ position: "relative" }}>
+            <video autoPlay ref={videoRef} onPlay={handleVideoOnPLay}></video>
+            <canvas
+              ref={canvasRef}
+              style={{ position: "absolute", top: 0, left: 0 }}
+            ></canvas>
           </div>
         )}
       </div>
