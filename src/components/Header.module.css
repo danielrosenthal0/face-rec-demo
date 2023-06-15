@@ -4,3 +4,7 @@ h1, p {
     font-size: 100%;
     
 }
+
+.content {
+    padding-bottom: 8rem;
+}
