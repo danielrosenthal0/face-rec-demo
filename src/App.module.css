@@ -3,8 +3,19 @@
     align-items: center;
     flex-direction: column;
     text-align: center;
+    padding: 24px;
 }
 
+.stuff {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+}
+
+.guy {
+    width:50%;
+}
 
 button {
   align-items: center;
