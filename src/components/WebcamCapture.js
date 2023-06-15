@@ -92,13 +92,14 @@ const WebcamCapture = (props) => {
           detections,
           displaySize
         );
+       
         if (canvasRef.current) {
             const context = canvasRef.current.getContext("2d");
             context.clearRect(0, 0, videoWidth, videoHeight);
             faceapi.draw.drawDetections(context, resizedDetections);
             faceapi.draw.drawFaceLandmarks(context, resizedDetections);
             faceapi.draw.drawFaceExpressions(context, resizedDetections);
-    
+            
             console.log("detections drawn");
         }
         
@@ -108,17 +109,20 @@ const WebcamCapture = (props) => {
 
   return (
     <Fragment>
-      <div className={styles.webcam}>
+     
         {webcamEnabled && modelsLoaded && (
-          <div style={{ position: "relative" }}>
-            <video autoPlay ref={videoRef} onPlay={handleVideoOnPLay}></video>
+          <div className={styles.vid} >
+            <video autoPlay ref={videoRef} onPlay={handleVideoOnPLay} style={{position: "relative", transform: "scaleX(-1)" }} ></video>
             <canvas
               ref={canvasRef}
-              style={{ position: "absolute", top: 0, left: 0 }}
+              style={{ position: "absolute",
+              top: 0,
+              left: 0,
+              transform: "scaleX(-1)"}}
             ></canvas>
           </div>
         )}
-      </div>
+      
     </Fragment>
   );
 };
