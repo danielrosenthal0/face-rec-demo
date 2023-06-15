@@ -1,6 +1,11 @@
+.content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+}
 
 
-/* CSS */
 button {
     width:15%;
   align-items: center;
