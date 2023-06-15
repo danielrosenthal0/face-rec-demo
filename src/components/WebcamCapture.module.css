@@ -1,9 +1,18 @@
-.webcam {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+.vidmask {
+    border-radius: 16px;
+    overflow: hidden;
+    -webkit-transform: translateZ(0);
+    position: relative;
 }
 
-video {
-    width: auto;
+.video {
+    position: relative;
+    transform: scaleX(-1);
+}
+
+.canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: scaleX(-1);
 }

@@ -47,8 +47,6 @@ const WebcamCapture = (props) => {
     enableWebcam();
   }, []);
 
-  
-
   //set up videostream of srcObject
   useEffect(() => {
     console.log("Got MediaStream:", stream);
@@ -59,7 +57,6 @@ const WebcamCapture = (props) => {
     return () => {
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
-        
       }
       console.log("ended video recording");
     };
@@ -92,33 +89,33 @@ const WebcamCapture = (props) => {
           detections,
           displaySize
         );
+
         if (canvasRef.current) {
-            const context = canvasRef.current.getContext("2d");
-            context.clearRect(0, 0, videoWidth, videoHeight);
-            faceapi.draw.drawDetections(context, resizedDetections);
-            faceapi.draw.drawFaceLandmarks(context, resizedDetections);
-            faceapi.draw.drawFaceExpressions(context, resizedDetections);
-    
-            console.log("detections drawn");
+          const context = canvasRef.current.getContext("2d");
+          context.clearRect(0, 0, videoWidth, videoHeight);
+          faceapi.draw.drawDetections(context, resizedDetections);
+          faceapi.draw.drawFaceLandmarks(context, resizedDetections);
+          faceapi.draw.drawFaceExpressions(context, resizedDetections);
+
+          console.log("detections drawn");
         }
-        
       }
     }, 25);
   };
 
   return (
     <Fragment>
-      <div className={styles.webcam}>
-        {webcamEnabled && modelsLoaded && (
-          <div style={{ position: "relative" }}>
-            <video autoPlay ref={videoRef} onPlay={handleVideoOnPLay}></video>
-            <canvas
-              ref={canvasRef}
-              style={{ position: "absolute", top: 0, left: 0 }}
-            ></canvas>
-          </div>
-        )}
-      </div>
+      {webcamEnabled && modelsLoaded && (
+        <div className={styles.vidmask}>
+          <video
+            className={styles.video}
+            autoPlay
+            ref={videoRef}
+            onPlay={handleVideoOnPLay}
+          ></video>
+          <canvas className={styles.canvas} ref={canvasRef}></canvas>
+        </div>
+      )}
     </Fragment>
   );
 };
