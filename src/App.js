@@ -18,8 +18,8 @@ function App() {
       <Header></Header>
       {webcamStarted ? (
         <WebcamCapture></WebcamCapture>
-      ) : <button onClick={handleStartWebcam}>Start Webcam Capture</button>}
-      {webcamStarted && <button onClick={handleEndWebcam}>End Webcam Capture</button>}
+      ) : <button onClick={handleStartWebcam}>Start webcam facial recognition</button>}
+      {webcamStarted && <button onClick={handleEndWebcam}>Stop</button>}
     </div>
   );
 }
