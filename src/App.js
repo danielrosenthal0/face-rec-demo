@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Analytics } from "@vercel/analytics/react"
 import WebcamCapture from "./components/WebcamCapture";
 import styles from './App.module.css';
 import Header from "./components/Header";
@@ -24,7 +25,9 @@ function App() {
         <button onClick={handleStartWebcam}>Start webcam facial recognition</button>
         </div>}
       {webcamStarted && <button onClick={handleEndWebcam}>Stop</button>}
+      <Analytics />
     </div>
+    
   );
 }
 
